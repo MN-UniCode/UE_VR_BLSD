@@ -1,0 +1,9 @@
+{
+	"BuildId": "25360045",
+	"Modules": 
+	{
+		"Convai": "UnrealEditor-Convai.dll",
+		"ConvaiEditor": "UnrealEditor-ConvaiEditor.dll",
+		"ConvaiVisionBase": "UnrealEditor-ConvaiVisionBase.dll"
+	}
+}
