@@ -2,3 +2,7 @@ UE_blsd/Content/MetaHumans/Common filter=lfs diff=lfs merge=lfs -text
 UE_blsd/Content/MetaHumans/Hadley filter=lfs diff=lfs merge=lfs -text
 UE_blsd/Content/MetaHumans/Omar filter=lfs diff=lfs merge=lfs -text
 UE_blsd/Content/MetaHumans/** filter=lfs diff=lfs merge=lfs -text
+ue_blsd/Plugins/Convai/**/*.dll filter=lfs diff=lfs merge=lfs -text
+ue_blsd/Plugins/Convai/**/*.lib filter=lfs diff=lfs merge=lfs -text
+ue_blsd/Plugins/Convai/**/*.pdb filter=lfs diff=lfs merge=lfs -text
+ue_blsd/Plugins/Convai/**/*.uasset filter=lfs diff=lfs merge=lfs -text
