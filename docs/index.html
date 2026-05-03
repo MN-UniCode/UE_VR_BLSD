@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VR-BLSD — Virtual Reality Life-Saving Skills</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* "Soft Clinical" Theme - Soft greys to prevent visual fatigue */
+    --bg: #e2e8f0;            /* Soft base grey - Replaces blinding white */
+    --bg2: #cbd5e1;           /* Slightly darker grey for alternating sections */
+    --surface: #f1f5f9;       /* Very light grey for cards and blocks */
+    --surface-hover: #f8fafc; /* Hover tone to make cards "lift" */
+    
+    /* Medical / Red Cross Colors */
+    --accent: #dc2626;  /* Main Emergency Red */
+    --accent2: #b91c1c; /* Dark Red for depth */
+    
+    /* Text */
+    --text: #0f172a;    /* Dark anthracite for perfect contrast */
+    --muted: #475569;   /* Neutral grey for secondary text */
+    
+    /* Clean Borders and Shadows */
+    --border: rgba(15, 23, 42, 0.08);
+    --glow: 0 10px 30px rgba(220, 38, 38, 0.12); /* Very soft red shadow */
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY (Very light to give texture) ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.3;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 3rem;
+    background: rgba(226, 232, 240, 0.85); /* Transparency on the base grey */
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.2rem;
+    color: var(--text);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .nav-logo span { color: var(--accent); }
+
+  nav ul { list-style: none; display: flex; gap: 2.5rem; }
+  nav a {
+    color: var(--muted); text-decoration: none;
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    transition: color 0.2s;
+    font-weight: 700;
+  }
+  nav a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+    position: relative;
+    padding: 8rem 2rem 4rem;
+    overflow: hidden;
+  }
+
+  /* Clean clinical grid */
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(15,23,42,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15,23,42,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(ellipse, rgba(220,38,38,0.06) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -60%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: var(--surface);
+    border: 1px solid rgba(220,38,38,0.2);
+    border-radius: 50px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 2.5rem;
+    animation: fadeUp 0.8s ease both;
+    font-weight: 700;
+    box-shadow: var(--shadow);
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  h1 .line1 { display: block; color: var(--text); }
+  h1 .line2 { display: block; color: var(--accent); }
+  h1 .line3 { display: block; color: var(--muted); font-size: 0.45em; letter-spacing: 0.05em; font-weight: 600; margin-top: 0.8rem; }
+
+  .hero-desc {
+    max-width: 620px;
+    font-size: 0.95rem; line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 3rem;
+    animation: fadeUp 0.8s 0.2s ease both;
+    font-weight: 500;
+  }
+
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.85rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
+    text-decoration: none; cursor: pointer;
+    border: none; transition: all 0.2s;
+    font-weight: 700;
+    border-radius: 4px;
+  }
+
+  .btn-primary {
+    background: var(--accent); color: #ffffff; /* White text on the red button */
+    box-shadow: var(--glow);
+  }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 15px 35px rgba(220,38,38,0.25); }
+
+  .btn-ghost {
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  .hero-stats {
+    display: flex; gap: 3rem; margin-top: 5rem;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800;
+    color: var(--accent); line-height: 1;
+  }
+  .stat-label { font-size: 0.7rem; color: var(--text); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0.5rem; font-weight: 700; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION BASE ── */
+  section {
+    padding: 7rem 2rem;
+    position: relative;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 0.8rem;
+    font-weight: 700;
+  }
+  .section-label::before {
+    content: ''; flex: 0 0 30px; height: 2px; background: var(--accent);
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 800; line-height: 1.1;
+    margin-bottom: 1.2rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .section-intro {
+    font-size: 0.95rem; line-height: 1.8; color: var(--muted);
+    max-width: 640px; margin-bottom: 4rem;
+  }
+
+  /* ── OVERVIEW ── */
+  #overview { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+  .chain {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .chain-step {
+    background: var(--surface);
+    padding: 2.5rem 1.5rem;
+    position: relative;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .chain-step:hover { background: var(--surface-hover); transform: translateY(-5px); z-index: 10; box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
+
+  .chain-num {
+    font-family: 'Syne', sans-serif; font-size: 3.5rem; font-weight: 800;
+    color: rgba(220,38,38,0.1); line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .chain-step h3 {
+    font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+    color: var(--text); margin-bottom: 0.8rem; letter-spacing: 0.02em;
+  }
+
+  .chain-step p { font-size: 0.85rem; color: var(--muted); line-height: 1.7; font-weight: 500;}
+
+  .chain-step .step-accent {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--accent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .chain-step:hover .step-accent { opacity: 1; }
+
+  /* ── INSIGHTS ── */
+  #insights { background: var(--bg); }
+
+  /* ── INSIGHT BLOCK ── */
+  .insight-section {
+    margin-bottom: 6rem;
+    padding-bottom: 6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .insight-section:last-child { border-bottom: none; margin-bottom: 0; }
+
+  .insight-header {
+    display: flex; align-items: flex-start; gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .insight-icon {
+    flex: 0 0 64px; height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-size: 1.8rem;
+    border-radius: 12px;
+    box-shadow: var(--glow);
+  }
+
+  .insight-header-text h2 {
+    font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+    color: var(--text); margin-bottom: 0.6rem;
+  }
+  .insight-header-text p { font-size: 0.95rem; color: var(--muted); line-height: 1.7; }
+
+  /* Feature cards inside insight */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+  .feature-card:hover {
+    background: var(--surface-hover);
+    border-color: rgba(220,38,38,0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
+    background: var(--accent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-card h3 {
+    font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+    color: var(--text); margin-bottom: 0.8rem;
+    letter-spacing: 0.02em;
+  }
+
+  .feature-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.8; margin-bottom: 1.5rem; font-weight: 500;}
+
+  /* Media placeholder */
+  .media-placeholder {
+    background: var(--bg2);
+    border: 1px dashed rgba(15,23,42,0.2);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.75rem; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    transition: background 0.2s, border-color 0.2s;
+    cursor: pointer;
+    font-weight: 700;
+    border-radius: 4px;
+  }
+  .media-placeholder:hover { background: var(--surface-hover); border-color: var(--accent); color: var(--accent); }
+  .media-placeholder .ph-icon { font-size: 2rem; opacity: 0.5; }
+
+  .ph-img { height: 160px; margin-bottom: 1rem; }
+  .ph-video { height: 200px; margin-bottom: 1rem; }
+
+  /* Wide feature (full-width) */
+  .feature-card.wide { grid-column: 1 / -1; }
+  .feature-card.wide .media-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  /* ── TECH STACK ── */
+  #tech { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .tech-card {
+    background: var(--surface); padding: 2.5rem 1.5rem;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .tech-card:hover { background: var(--surface-hover); transform: scale(1.02); z-index: 5; box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
+
+  .tech-tag {
+    display: inline-block;
+    font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent); background: rgba(220,38,38,0.1);
+    padding: 0.3rem 0.8rem; margin-bottom: 1rem;
+    font-weight: 700;
+    border-radius: 4px;
+  }
+  .tech-card h3 {
+    font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+    color: var(--text); margin-bottom: 0.6rem;
+  }
+  .tech-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.7; font-weight: 500;}
+
+  /* ── FUTURE IMPROVEMENTS ── */
+  #future { background: var(--bg); border-bottom: 1px solid var(--border); }
+  
+  .future-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    opacity: 0.8;
+  }
+
+  /* ── VIDEO DEMO ── */
+  #demo { background: var(--bg2); text-align: center; }
+
+  .demo-frame {
+    position: relative;
+    max-width: 900px; margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+  }
+
+  .demo-frame::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(220,38,38,0.03) 0%, transparent 50%, rgba(15,23,42,0.02) 100%);
+    pointer-events: none; z-index: 1;
+  }
+
+  .demo-inner {
+    height: 500px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1rem; position: relative; z-index: 2;
+  }
+
+  .demo-play {
+    width: 90px; height: 90px;
+    background: var(--accent);
+    color: #ffffff; /* White icon on red */
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; cursor: pointer;
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    box-shadow: var(--glow);
+    padding-left: 8px; /* To visually center the play triangle */
+  }
+  .demo-play:hover { transform: scale(1.1); background: var(--accent2); box-shadow: 0 15px 35px rgba(220,38,38,0.3); }
+
+  .demo-label {
+    font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text); font-weight: 700; margin-top: 1rem;
+  }
+
+  /* Placeholder for actual YouTube/video embed */
+  .video-embed-placeholder {
+    width: 100%; height: 500px;
+    background: var(--bg2);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.5rem; color: var(--muted);
+    font-size: 0.85rem; letter-spacing: 0.08em;
+  }
+
+  .video-embed-placeholder .big-icon { font-size: 4.5rem; opacity: 0.2; color: var(--text); }
+  .video-embed-placeholder p { max-width: 300px; text-align: center; line-height: 1.7; font-weight: 500; }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 3rem 2rem;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem;
+    color: var(--text); letter-spacing: 0.1em; margin-bottom: 0.5rem;
+  }
+  .footer-logo span { color: var(--accent); }
+  
+  .footer-sub { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.12em; font-weight: 500;}
+  .footer-links { display: flex; gap: 2rem; justify-content: center; margin-top: 2.5rem; }
+  .footer-links a { font-size: 0.75rem; color: var(--text); font-weight: 700; text-decoration: none; letter-spacing: 0.1em; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-copy { font-size: 0.7rem; color: var(--muted); margin-top: 2.5rem; opacity: 0.8; }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav ul { display: none; }
+    nav { padding: 1rem 1.5rem; }
+    .hero-stats { gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+    .insight-header { flex-direction: column; gap: 1rem; }
+    .feature-card.wide .media-row { grid-template-columns: 1fr; }
+    section { padding: 5rem 1.5rem; }
+    h1 { font-size: 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">VR<span>—</span>BLSD</div>
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#insights">Insights</a></li>
+    <li><a href="#tech">Tech</a></li>
+    <li><a href="#future">Roadmap</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="https://github.com/MN-UniCode/UE_VR_BLSD" target="_blank">GitHub ↗</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-badge">University of Genoa · Augmented and Virtual Reality</div>
+
+  <h1>
+    <span class="line1">Virtual Reality</span>
+    <span class="line2">Life-Saving</span>
+    <span class="line3">Basic Life Support & Defibrillation Training</span>
+  </h1>
+
+  <p class="hero-desc">
+    An immersive experience to teach BLSD maneuvers. High-fidelity scenarios, a real-time conversational AI tutor, and multi-platform support — from Meta Quest to Desktop.
+  </p>
+
+  <div class="hero-cta">
+    <a href="https://github.com/MN-UniCode/UE_VR_BLSD" target="_blank" class="btn btn-primary">↓ Clone Repository</a>
+    <a href="#insights" class="btn btn-ghost">Explore the project →</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">4</div>
+      <div class="stat-label">BLSD Steps</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">AI</div>
+      <div class="stat-label">Adaptive Tutor</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">VR+</div>
+      <div class="stat-label">Multi-Platform</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">UE5</div>
+      <div class="stat-label">Unreal Engine</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="overview">
+  <div class="container">
+    <div class="section-label reveal">Chain of Survival</div>
+    <h2 class="section-title reveal">How the simulation works</h2>
+    <p class="section-intro reveal">
+      The scenario begins in an indoor public environment when a virtual character collapses due to sudden cardiac arrest. The AI tutor guides the user through each phase of the official BLSD protocol.
+    </p>
+
+    <div class="chain reveal">
+      <div class="chain-step">
+        <div class="step-accent"></div>
+        <div class="chain-num">01</div>
+        <h3>Safety & Assessment</h3>
+        <p>Visual inspection of the area and assessment of the victim's responsiveness and breathing.</p>
+      </div>
+      <div class="chain-step">
+        <div class="step-accent"></div>
+        <div class="chain-num">02</div>
+        <h3>Call 112 (Emergency)</h3>
+        <p>Alerting emergency services via the interactive phone integrated into the simulation.</p>
+      </div>
+      <div class="chain-step">
+        <div class="step-accent"></div>
+        <div class="chain-num">03</div>
+        <h3>CPR</h3>
+        <p>Chest compressions and artificial respiration to maintain blood circulation.</p>
+      </div>
+      <div class="chain-step">
+        <div class="step-accent"></div>
+        <div class="chain-num">04</div>
+        <h3>AED Defibrillation</h3>
+        <p>Locating and using the public AED with step-by-step visual and vocal guidance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="insights">
+  <div class="container">
+    <div class="section-label reveal">Technical Details</div>
+    <h2 class="section-title reveal">Project Insights</h2>
+    <p class="section-intro reveal">
+      The technical and design innovations that make VR-BLSD a unique experience.
+    </p>
+
+    <div class="insight-section reveal">
+      <div class="insight-header">
+        <div class="insight-icon">🤖</div>
+        <div class="insight-header-text">
+          <h2>Conversational AI Tutor — ConvAI</h2>
+          <p>Integration of an adaptive voice AI for real-time procedural feedback and management of the user's emotional response during simulated panic scenarios.</p>
+        </div>
+      </div>
+
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <h3>🎙️ Custom Push-to-Talk</h3>
+          <p>Custom voice activation system integrated directly into Unreal Engine with Blueprints, optimized for minimum latency in standalone VR mode.</p>
+          <div class="media-placeholder ph-img">
+            <span class="ph-icon">🖼️</span>
+            <span>Insert screenshot / image</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <h3>↩️ Dynamic Character Look-At</h3>
+          <p>The MetaHuman chatbot autonomously rotates towards the user during dialogue, creating natural eye contact that increases presence and the realism of the conversation.</p>
+          <div class="media-placeholder ph-img">
+            <span class="ph-icon">🖼️</span>
+            <span>Insert screenshot / image</span>
+          </div>
+          <div class="media-placeholder ph-video" style="margin-top:0.8rem;">
+            <span class="ph-icon">▶️</span>
+            <span>Insert video / clip</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <h3>⚡ Proactive Dialogue — AI-First</h3>
+          <p>Unlike traditional chatbots, the ConvAI tutor autonomously initiates the first interaction as soon as the user enters the scene, lowering the barrier to entry and making the experience more natural and cinematic.</p>
+          <div class="media-placeholder ph-img">
+            <span class="ph-icon">🖼️</span>
+            <span>Insert screenshot / image</span>
+          </div>
+          <div class="media-placeholder ph-video" style="margin-top:0.8rem;">
+            <span class="ph-icon">▶️</span>
+            <span>Insert video / clip</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="insight-section reveal">
+      <div class="insight-header">
+        <div class="insight-icon">📞</div>
+        <div class="insight-header-text">
+          <h2>Interactive Phone — Calling 112</h2>
+          <p>A fully functional in-world phone with a phonebook, audio, and differentiated handling between Desktop and VR modes.</p>
+        </div>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card wide">
+          <h3>📱 Dual-Mode: Desktop & VR</h3>
+          <p>
+            In Desktop mode, the user interacts via mouse and keyboard with a classic on-screen interface. In VR mode, interaction is physical: the user grabs the phone, scrolls through the phonebook with their hands, and lifts the receiver to dial the emergency number — realistic audio included.
+          </p>
+          <div class="media-row">
+            <div class="media-placeholder ph-img">
+              <span class="ph-icon">🖼️</span>
+              <span>Desktop Screenshot</span>
+            </div>
+            <div class="media-placeholder ph-img">
+              <span class="ph-icon">🖼️</span>
+              <span>VR Screenshot</span>
+            </div>
+          </div>
+          <div class="media-placeholder ph-video" style="margin-top:1rem;">
+            <span class="ph-icon">▶️</span>
+            <span>Insert phone demo video / clip</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-section reveal">
+      <div class="insight-header">
+        <div class="insight-icon">⚡</div>
+        <div class="insight-header-text">
+          <h2>AED Objects — Interactive Defibrillator</h2>
+          <p>Complete interaction system with the defibrillator: from opening the AED to attaching the pads to the victim.</p>
+        </div>
+      </div>
+
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <h3>🔓 Opening AED & Pads</h3>
+          <p>The AED can be physically opened in the VR environment. Inside, the electrode pads are visible and grabbable; they can be dragged and placed correctly on the victim's chest following the tutor's vocal instructions.</p>
+          <div class="media-placeholder ph-img">
+            <span class="ph-icon">🖼️</span>
+            <span>Insert screenshot / image</span>
+          </div>
+          <div class="media-placeholder ph-video" style="margin-top:0.8rem;">
+            <span class="ph-icon">▶️</span>
+            <span>Insert video / clip</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <h3>🗄️ AED Holder with Animation</h3>
+          <p>To increase environmental realism, a wall mount for the AED (AED Holder) was designed. The user can interact with it to open and close it via a smooth animation, revealing the defibrillator inside — exactly as would happen in a real emergency.</p>
+          <div class="media-placeholder ph-img">
+            <span class="ph-icon">🖼️</span>
+            <span>Insert screenshot / image</span>
+          </div>
+          <div class="media-placeholder ph-video" style="margin-top:0.8rem;">
+            <span class="ph-icon">▶️</span>
+            <span>Insert animation video / clip</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="tech">
+  <div class="container">
+    <div class="section-label reveal">Tech Stack</div>
+    <h2 class="section-title reveal">Technologies Used</h2>
+    <p class="section-intro reveal">Industry-standard tools for real-time 3D rendering and advanced conversational AI integration.</p>
+
+    <div class="tech-grid reveal">
+      <div class="tech-card">
+        <div class="tech-tag">Engine</div>
+        <h3>Unreal Engine 5.2.1</h3>
+        <p>Core engine for immersive environments. All logic is developed in Blueprints for maximum flexibility and readability.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-tag">AI</div>
+        <h3>ConvAI Plugin v4.0.0</h3>
+        <p>Real-time connection to the AI backend for low-latency voice interactions and procedural adaptive feedback.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-tag">Characters</div>
+        <h3>MetaHuman Plugin</h3>
+        <p>High-fidelity photorealistic 3D characters, both for the virtual tutor and the unconscious victim.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-tag">Hardware</div>
+        <h3>Meta Quest + Desktop</h3>
+        <p>Standalone VR support via Meta Quest headset and Desktop mode with mouse and keyboard for maximum accessibility.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="future">
+  <div class="container">
+    <div class="section-label reveal">Roadmap</div>
+    <h2 class="section-title reveal">Future Improvements</h2>
+    <p class="section-intro reveal">
+      While the current prototype successfully demonstrates the viability of an AI-guided BLSD simulation, several avenues remain for expanding its educational scope and realism, ensuring strict alignment with the procedural steps outlined in the international resuscitation guidelines.
+    </p>
+
+    <div class="feature-grid reveal">
+      <div class="feature-card">
+        <div class="future-icon">🚑</div>
+        <h3>Enhanced EMS Interaction</h3>
+        <p>Currently, the simulation simplifies the process of alerting emergency medical services. A future iteration will implement a dynamic conversation tree with the dispatcher, requiring the user to accurately answer standard assessment questions (e.g., patient responsiveness, breathing status, exact location) in accordance with official BLSD protocols.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="future-icon">🫀</div>
+        <h3>CPR Mechanics</h3>
+        <p>Although the prototype focuses on early defibrillation, manual chest compressions and rescue breaths are vital links in the chain of survival. Future versions will introduce interactive CPR mechanics, challenging users to maintain the correct compression depth and tempo under pressure.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="future-icon">⚡</div>
+        <h3>AED Shock Delivery</h3>
+        <p>The final phase of the Automated External Defibrillator protocol will be fully implemented. This will require the user to actively ensure the safety of the scene before manually confirming and delivering the simulated shock.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="demo">
+  <div class="container">
+    <div class="section-label reveal" style="justify-content:center;">Demonstration Video</div>
+    <h2 class="section-title reveal">Watch the full simulation</h2>
+    <p class="section-intro reveal" style="margin:0 auto 3rem; text-align:center;">
+      A walkthrough of the full experience: from entering the scene, to the AI tutor's intervention, up to the defibrillation of the victim.
+    </p>
+
+    <div class="demo-frame reveal">
+      <div class="video-embed-placeholder">
+        <div class="big-icon">▶</div>
+        <p>Insert the link to the demonstration video here<br>(YouTube embed or .mp4 file)</p>
+        <div style="font-size:0.65rem; letter-spacing:0.1em; opacity:0.5;">Replace the placeholder block with an &lt;iframe&gt; or &lt;video&gt;</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">VR<span>—</span>BLSD</div>
+  <div class="footer-sub">Virtual Reality for Life-Saving Skills · University of Genoa</div>
+  <div class="footer-links">
+    <a href="#overview">Overview</a>
+    <a href="#insights">Insights</a>
+    <a href="#tech">Tech</a>
+    <a href="#future">Roadmap</a>
+    <a href="#demo">Demo</a>
+    <a href="https://github.com/MN-UniCode/UE_VR_BLSD" target="_blank">GitHub</a>
+  </div>
+  <div class="footer-copy">Developed for the Augmented and Virtual Reality course · All rights reserved</div>
+</footer>
+
+<script>
+  // ── Scroll reveal ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── Parallax hero glow ──
+  document.addEventListener('mousemove', (e) => {
+    const glow = document.querySelector('.hero-glow');
+    if (!glow) return;
+    const x = (e.clientX / window.innerWidth - 0.5) * 40;
+    const y = (e.clientY / window.innerHeight - 0.5) * 40;
+    glow.style.transform = `translate(calc(-50% + ${x}px), calc(-60% + ${y}px))`;
+  });
+</script>
+
+</body>
+</html>
