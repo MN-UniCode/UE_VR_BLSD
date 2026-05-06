@@ -193,7 +193,7 @@
     position: relative;
   }
 
-  .container { max-width: 1100px; margin: 0 auto; }
+  .container { max-width: 1600px; margin: 0 auto; padding: 0 1.5rem; }
 
   .section-label {
     font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase;
@@ -260,6 +260,21 @@
   }
   .chain-step:hover .step-accent { opacity: 1; }
 
+  .link-future {
+    display: inline-block;
+    margin-top: 0.8rem;
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.2s;
+  }
+  
+  .link-future:hover {
+    color: var(--accent2);
+    text-decoration: underline;
+  }
+
   /* ── INSIGHTS ── */
   #insights { background: var(--bg); }
 
@@ -296,19 +311,56 @@
   /* Feature cards inside insight */
   .feature-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, max(280px, calc((100% - 3.6rem) / 4))), 1fr));
+    gap: 1.2rem;
+  }
+
+  /* Colonne proporzionali al numero di card */
+  .feature-grid:has(> .feature-card:nth-child(1):last-child)  { grid-template-columns: 1fr; }
+  .feature-grid:has(> .feature-card:nth-child(2):last-child)  { grid-template-columns: repeat(2, 1fr); }
+  .feature-grid:has(> .feature-card:nth-child(3):last-child)  { grid-template-columns: repeat(3, 1fr); }
+  .feature-grid:has(> .feature-card:nth-child(4):last-child)  { grid-template-columns: repeat(2, 1fr); }
+  .feature-grid:has(> .feature-card.wide:only-child)          { grid-template-columns: 1fr; }
+
+  .feature-card.wide .media-row video {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: center bottom; /* <--- LA MAGIA È QUI */
+  }
+
+  @media (max-width: 1200px) {
+    .feature-grid,
+    .feature-grid:has(> .feature-card:nth-child(3):last-child),
+    .feature-grid:has(> .feature-card:nth-child(4):last-child) {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   .feature-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    padding: 2rem;
+    padding: 1.5rem;
     position: relative;
     overflow: hidden;
     border-radius: 8px;
     box-shadow: var(--shadow);
     transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s, background 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* card-text contiene h3+p e viene equalizzato via JS */
+  .card-text {
+    flex: 0 0 auto;
+    margin-bottom: 0.8rem;
+  }
+
+  /* Prima immagine/video: si attacca al fondo del testo equalizzato,
+     lo spazio extra va sopra la prima media element */
+  .feature-card > .ph-img:first-of-type,
+  .feature-card > .media-placeholder:first-of-type {
+    margin-top: auto;
   }
   .feature-card:hover {
     background: var(--surface-hover);
@@ -331,7 +383,7 @@
     letter-spacing: 0.02em;
   }
 
-  .feature-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.8; margin-bottom: 1.5rem; font-weight: 500;}
+  .feature-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.8; margin-bottom: 0; font-weight: 500; }
 
   /* Media placeholder */
   .media-placeholder {
@@ -339,25 +391,54 @@
     border: 1px dashed rgba(15,23,42,0.2);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 0.5rem;
-    font-size: 0.75rem; color: var(--muted);
-    letter-spacing: 0.1em; text-transform: uppercase;
+    gap: 0.4rem;
+    font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+    color: var(--muted);
+    letter-spacing: 0.06em; text-transform: uppercase;
     transition: background 0.2s, border-color 0.2s;
     cursor: pointer;
     font-weight: 700;
     border-radius: 4px;
+    padding: 0.6rem;
+    text-align: center;
+    min-height: 60px;
   }
   .media-placeholder:hover { background: var(--surface-hover); border-color: var(--accent); color: var(--accent); }
-  .media-placeholder .ph-icon { font-size: 2rem; opacity: 0.5; }
+  .media-placeholder .ph-icon {
+    font-size: clamp(1.2rem, 2.5vw, 2rem);
+    opacity: 0.5;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .media-placeholder .ph-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    display: block;
+  }
 
-  .ph-img { height: 160px; margin-bottom: 1rem; }
-  .ph-video { height: 200px; margin-bottom: 1rem; }
+  .ph-img { height: auto; margin-bottom: 0.8rem; }
+  .ph-img img {
+    width: 100%;
+    height: clamp(140px, 18vw, 240px);
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: zoom-in;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: block;
+  }
+  .ph-img img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  }
+  .ph-video { height: clamp(120px, 16vw, 220px); margin-bottom: 0.8rem; }
 
   /* Wide feature (full-width) */
   .feature-card.wide { grid-column: 1 / -1; }
   .feature-card.wide .media-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
     margin-top: 1rem;
   }
@@ -487,15 +568,105 @@
   }
   .reveal.visible { opacity: 1; transform: translateY(0); }
 
-  /* ── RESPONSIVE ── */
+  /* ── LIGHTBOX ── */
+  #lightbox {
+    display: none;
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0,0,0,0.92);
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    cursor: zoom-out;
+  }
+  #lightbox.active { display: flex; }
+
+  #lightbox-inner {
+    position: relative;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    user-select: none;
+    cursor: default;
+  }
+  /* cursore grab solo quando si è zoomati */
+  #lightbox-inner.zoomed    { cursor: grab; }
+  #lightbox-inner.dragging  { cursor: grabbing !important; }
+
+  #lightbox-img {
+    display: block;
+    max-width: 95vw;
+    max-height: 85vh;
+    border-radius: 4px;
+    transform-origin: center center;
+    will-change: transform;
+    pointer-events: none; /* il drag lo gestisce lbInner */
+  }
+
+  #lightbox-video {
+    display: block;
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 8px;
+  }
+
+  #lightbox-close {
+    position: fixed; top: 1.5rem; right: 1.5rem;
+    width: 44px; height: 44px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 50%;
+    font-size: 1.4rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10001;
+    transition: background 0.2s, transform 0.2s;
+    line-height: 1;
+  }
+  #lightbox-close:hover { background: var(--accent2); transform: scale(1.1); }
+
+  #lightbox-zoom-controls {
+    display: flex; gap: 0.8rem; align-items: center;
+  }
+  .lb-zoom-btn {
+    background: rgba(255,255,255,0.12);
+    color: #fff; border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px; padding: 0.4rem 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; transition: background 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .lb-zoom-btn:hover { background: rgba(220,38,38,0.5); }
+
+  #lb-zoom-level {
+    color: rgba(255,255,255,0.6);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem; min-width: 50px; text-align: center;
+  }
+
+  @media (max-width: 960px) {
+    .insight-icon { display: none; }
+  }
+
+  /* ── SECTION PADDING REDUCED ── */
+  section { padding: 5rem 0; }
+
   @media (max-width: 768px) {
     nav ul { display: none; }
     nav { padding: 1rem 1.5rem; }
     .hero-stats { gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
     .insight-header { flex-direction: column; gap: 1rem; }
-    .feature-card.wide .media-row { grid-template-columns: 1fr; }
-    section { padding: 5rem 1.5rem; }
+    .insight-icon { display: none; }
+    .feature-card.wide .media-row { grid-template-columns: 1fr !important; }
+    section { padding: 4rem 0; }
     h1 { font-size: 3rem; }
+    /* Su mobile tutto a 1 colonna, override :has() selectors */
+    .feature-grid,
+    .feature-grid:has(> .feature-card:nth-child(2):last-child),
+    .feature-grid:has(> .feature-card:nth-child(3):last-child),
+    .feature-grid:has(> .feature-card:nth-child(4):last-child) {
+      grid-template-columns: 1fr !important;
+    }
   }
 </style>
 </head>
@@ -581,7 +752,7 @@
         <div class="step-accent"></div>
         <div class="chain-num">03</div>
         <h3>CPR</h3>
-        <p>Chest compressions and artificial respiration to maintain blood circulation.</p>
+        <p>Chest compressions and artificial respiration to maintain blood circulation. <br><a href="#future" class="link-future">Read about future implementation ↗</a></p>
       </div>
       <div class="chain-step">
         <div class="step-accent"></div>
@@ -615,37 +786,40 @@
       <div class="feature-grid">
 
         <div class="feature-card">
-          <h3>🎙️ Custom Push-to-Talk</h3>
-          <p>Custom voice activation system integrated directly into Unreal Engine with Blueprints, optimized for minimum latency in standalone VR mode.</p>
-          <div class="media-placeholder ph-img">
-            <span class="ph-icon">🖼️</span>
-            <span>Insert screenshot / image</span>
+          <div class="card-text"><h3>🎙️ Custom Push-to-Talk</h3>
+          <p>Custom voice activation system integrated directly into Unreal Engine with Blueprints, optimized for minimum latency in standalone VR mode.</p></div>
+          <div class="ph-img">
+            <img src="./assets/images/ptt.png" alt="Custom Push-to-Talk screenshot" class="lightbox-trigger" data-src="./assets/images/ptt.png" data-type="image">
           </div>
         </div>
-
+        
         <div class="feature-card">
-          <h3>↩️ Dynamic Character Look-At</h3>
-          <p>The MetaHuman chatbot autonomously rotates towards the user during dialogue, creating natural eye contact that increases presence and the realism of the conversation.</p>
-          <div class="media-placeholder ph-img">
-            <span class="ph-icon">🖼️</span>
-            <span>Insert screenshot / image</span>
-          </div>
-          <div class="media-placeholder ph-video" style="margin-top:0.8rem;">
-            <span class="ph-icon">▶️</span>
-            <span>Insert video / clip</span>
+          <div class="card-text"><h3>↩️ Dynamic Character Look-At</h3>
+          <p>The MetaHuman chatbot autonomously rotates towards the user during dialogue, creating natural eye contact that increases presence and the realism of the conversation.</p></div>
+          <div class="ph-img">
+            <img src="./assets/images/rotate.png" alt="Dynamic character look-at screenshot" class="lightbox-trigger" data-src="./assets/images/rotate.png" data-type="image">
           </div>
         </div>
-
+        
         <div class="feature-card">
-          <h3>⚡ Proactive Dialogue — AI-First</h3>
-          <p>Unlike traditional chatbots, the ConvAI tutor autonomously initiates the first interaction as soon as the user enters the scene, lowering the barrier to entry and making the experience more natural and cinematic.</p>
-          <div class="media-placeholder ph-img">
-            <span class="ph-icon">🖼️</span>
-            <span>Insert screenshot / image</span>
+          <div class="card-text"><h3>⚡ Proactive Dialogue — AI-First</h3>
+          <p>Unlike traditional chatbots, the ConvAI tutor autonomously initiates the first interaction as soon as the user enters the scene, lowering the barrier to entry and making the experience more natural and cinematic.</p></div>
+          <div class="ph-img">
+            <img src="./assets/images/start.png" alt="Automatic dialogue initiation screenshot" class="lightbox-trigger" data-src="./assets/images/start.png" data-type="image">
           </div>
-          <div class="media-placeholder ph-video" style="margin-top:0.8rem;">
-            <span class="ph-icon">▶️</span>
-            <span>Insert video / clip</span>
+          <div class="ph-img">
+            <img src="./assets/images/trigger.png" alt="Trigger-based interaction screenshot" class="lightbox-trigger" data-src="./assets/images/trigger.png" data-type="image">
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="card-text"><h3>📍 Autonomous Pathfinding & Spatial Awareness</h3>
+          <p>Leveraging Unreal Engine's navigation system, the ConvAI agent autonomously tracks and moves toward the MetaHuman's position in real-time. This ensures seamless spatial interaction, allowing the chatbot to proactively reach the user's location based on dynamic gameplay events.</p></div>
+          <div class="ph-img">
+            <img src="./assets/images/moveTo.png" alt="Autonomous convai character pathfinding blueprints" class="lightbox-trigger" data-src="./assets/images/moveTo.png" data-type="image">
+          </div>
+          <div class="ph-img">
+            <img src="./assets/images/obj.png" alt="Convai character spatial awareness objects" class="lightbox-trigger" data-src="./assets/images/obj.png" data-type="image">
           </div>
         </div>
 
@@ -663,23 +837,19 @@
 
       <div class="feature-grid">
         <div class="feature-card wide">
-          <h3>📱 Dual-Mode: Desktop & VR</h3>
+          <div class="card-text"><h3>📱 Dual-Mode: Desktop & VR</h3>
           <p>
             In Desktop mode, the user interacts via mouse and keyboard with a classic on-screen interface. In VR mode, interaction is physical: the user grabs the phone, scrolls through the phonebook with their hands, and lifts the receiver to dial the emergency number — realistic audio included.
-          </p>
+          </p></div>
           <div class="media-row">
-            <div class="media-placeholder ph-img">
-              <span class="ph-icon">🖼️</span>
-              <span>Desktop Screenshot</span>
-            </div>
-            <div class="media-placeholder ph-img">
-              <span class="ph-icon">🖼️</span>
-              <span>VR Screenshot</span>
-            </div>
-          </div>
-          <div class="media-placeholder ph-video" style="margin-top:1rem;">
-            <span class="ph-icon">▶️</span>
-            <span>Insert phone demo video / clip</span>
+            <video controls width="100%" height="auto" autoplay loop muted playsinline style="border-radius: 4px;">
+              <source src="./assets/videos/VR_phone.mp4" type="video/mp4">
+              Your browser doesn't support the video tag.
+            </video>
+            <video controls width="100%" height="auto" autoplay loop muted playsinline style="border-radius: 4px;">
+              <source src="./assets/videos/desktop_phone.mp4" type="video/mp4">
+              Your browser doesn't support the video tag.
+            </video>
           </div>
         </div>
       </div>
@@ -697,29 +867,27 @@
       <div class="feature-grid">
 
         <div class="feature-card">
-          <h3>🔓 Opening AED & Pads</h3>
-          <p>The AED can be physically opened in the VR environment. Inside, the electrode pads are visible and grabbable; they can be dragged and placed correctly on the victim's chest following the tutor's vocal instructions.</p>
-          <div class="media-placeholder ph-img">
-            <span class="ph-icon">🖼️</span>
-            <span>Insert screenshot / image</span>
+          <div class="card-text"><h3>🔓 Opening AED & Pads</h3>
+          <p>The AED can be physically opened in the VR environment. Inside, the electrode pads are visible and grabbable; they can be dragged and placed correctly on the victim's chest following the tutor's vocal instructions.</p></div>
+          <div class="ph-img">
+            <img src="./assets/images/aed.png" alt="AED interaction blueprints" class="lightbox-trigger" data-src="./assets/images/aed.png" data-type="image">
           </div>
-          <div class="media-placeholder ph-video" style="margin-top:0.8rem;">
-            <span class="ph-icon">▶️</span>
-            <span>Insert video / clip</span>
-          </div>
+          <video controls width="100%" height="auto" autoplay loop muted playsinline style="border-radius: 4px;">
+            <source src="./assets/videos/AED_interaction.mp4" type="video/mp4">
+            Your browser doesn't support the video tag.
+          </video>
         </div>
 
         <div class="feature-card">
-          <h3>🗄️ AED Holder with Animation</h3>
-          <p>To increase environmental realism, a wall mount for the AED (AED Holder) was designed. The user can interact with it to open and close it via a smooth animation, revealing the defibrillator inside — exactly as would happen in a real emergency.</p>
-          <div class="media-placeholder ph-img">
-            <span class="ph-icon">🖼️</span>
-            <span>Insert screenshot / image</span>
+          <div class="card-text"><h3>🗄️ AED Holder with Animation</h3>
+          <p>To increase environmental realism, a wall mount for the AED (AED Holder) was designed. The user can interact with it to open and close it via a smooth animation, revealing the defibrillator inside — exactly as would happen in a real emergency.</p></div>
+          <div class="ph-img">
+            <img src="./assets/images/holder.png" alt="AED Holder with animation blueprints" class="lightbox-trigger" data-src="./assets/images/holder.png" data-type="image">
           </div>
-          <div class="media-placeholder ph-video" style="margin-top:0.8rem;">
-            <span class="ph-icon">▶️</span>
-            <span>Insert animation video / clip</span>
-          </div>
+          <video controls width="100%" height="auto" autoplay loop muted playsinline style="border-radius: 4px;">
+            <source src="./assets/videos/holder_animation.mp4" type="video/mp4">
+            Your browser doesn't support the video tag.
+          </video>
         </div>
 
       </div>
@@ -804,14 +972,28 @@
     </p>
 
     <div class="demo-frame reveal">
-      <div class="video-embed-placeholder">
-        <div class="big-icon">▶</div>
-        <p>Insert the link to the demonstration video here<br>(YouTube embed or .mp4 file)</p>
-        <div style="font-size:0.65rem; letter-spacing:0.1em; opacity:0.5;">Replace the placeholder block with an &lt;iframe&gt; or &lt;video&gt;</div>
-      </div>
+      <video controls width="100%" height="auto" loop muted playsinline style="border-radius: 4px;">
+        <source src="./assets/videos/full_ex.mp4" type="video/mp4">
+        Your browser doesn't support the video tag.
+      </video>
     </div>
   </div>
 </section>
+
+<!-- ── LIGHTBOX ── -->
+<div id="lightbox" role="dialog" aria-modal="true">
+  <button id="lightbox-close" aria-label="Chiudi">✕</button>
+  <div id="lightbox-inner">
+    <img id="lightbox-img" src="" alt="Preview" style="display:none;">
+    <video id="lightbox-video" controls style="display:none;"></video>
+  </div>
+  <div id="lightbox-zoom-controls" id="lb-img-controls">
+    <button class="lb-zoom-btn" id="lb-zoom-out">− Zoom Out</button>
+    <span id="lb-zoom-level">100%</span>
+    <button class="lb-zoom-btn" id="lb-zoom-in">+ Zoom In</button>
+    <button class="lb-zoom-btn" id="lb-zoom-reset">Reset</button>
+  </div>
+</div>
 
 <footer>
   <div class="footer-logo">VR<span>—</span>BLSD</div>
@@ -840,7 +1022,171 @@
 
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-  // ── Parallax hero glow ──
+  // ── LIGHTBOX ──
+  const lb          = document.getElementById('lightbox');
+  const lbInner     = document.getElementById('lightbox-inner');
+  const lbImg       = document.getElementById('lightbox-img');
+  const lbVideo     = document.getElementById('lightbox-video');
+  const lbClose     = document.getElementById('lightbox-close');
+  const lbZoomIn    = document.getElementById('lb-zoom-in');
+  const lbZoomOut   = document.getElementById('lb-zoom-out');
+  const lbZoomReset = document.getElementById('lb-zoom-reset');
+  const lbZoomLevel = document.getElementById('lb-zoom-level');
+
+  let currentZoom = 1;
+  // Pan state
+  let isDragging = false, dragSX = 0, dragSY = 0, panX = 0, panY = 0, panSX = 0, panSY = 0;
+
+  function applyTransform(smooth) {
+    lbImg.style.transition = smooth ? 'transform 0.18s ease' : 'none';
+    lbImg.style.transform  = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
+    lbZoomLevel.textContent = Math.round(currentZoom * 100) + '%';
+  }
+
+  function clampPan() {
+    // Quanto l'immagine "sporge" rispetto al suo centro (che è il centro del contenitore)
+    const iw = lbImg.offsetWidth  * currentZoom;
+    const ih = lbImg.offsetHeight * currentZoom;
+    const cw = lbInner.offsetWidth;
+    const ch = lbInner.offsetHeight;
+    const maxX = Math.max(0, (iw - cw) / 2);
+    const maxY = Math.max(0, (ih - ch) / 2);
+    panX = Math.min(maxX, Math.max(-maxX, panX));
+    panY = Math.min(maxY, Math.max(-maxY, panY));
+  }
+
+  function setZoom(z, smooth) {
+    currentZoom = Math.min(Math.max(z, 1), 8);
+    // Se torniamo a 1x, azzera il pan
+    if (currentZoom === 1) { panX = 0; panY = 0; }
+    else clampPan();
+    lbInner.classList.toggle('zoomed', currentZoom > 1);
+    applyTransform(smooth !== false);
+  }
+
+  function openLightbox(src, type) {
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    currentZoom = 1; panX = 0; panY = 0;
+    lbInner.classList.remove('zoomed', 'dragging');
+    if (type === 'image') {
+      lbImg.src = src;
+      lbImg.style.display  = 'block';
+      lbVideo.style.display = 'none';
+      lbVideo.pause();
+      lbImg.style.transform = 'translate(0,0) scale(1)';
+      lbImg.style.transition = 'none';
+      document.getElementById('lightbox-zoom-controls').style.display = 'flex';
+      lbZoomLevel.textContent = '100%';
+    } else {
+      lbVideo.src = src;
+      lbVideo.style.display = 'block';
+      lbImg.style.display   = 'none';
+      document.getElementById('lightbox-zoom-controls').style.display = 'none';
+      lbVideo.play();
+    }
+  }
+
+  function closeLightbox() {
+    lb.classList.remove('active');
+    document.body.style.overflow = '';
+    lbVideo.pause(); lbVideo.src = '';
+    lbImg.src = '';
+    currentZoom = 1; panX = 0; panY = 0;
+    lbInner.classList.remove('zoomed', 'dragging');
+  }
+
+  // ── Drag per pan (solo quando zoomato) ──
+  lbInner.addEventListener('mousedown', (e) => {
+    if (e.button !== 0 || currentZoom <= 1) return;
+    isDragging = true;
+    dragSX = e.clientX; dragSY = e.clientY;
+    panSX = panX;       panSY = panY;
+    lbInner.classList.add('dragging');
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    panX = panSX + (e.clientX - dragSX);
+    panY = panSY + (e.clientY - dragSY);
+    clampPan();
+    applyTransform(false);
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    lbInner.classList.remove('dragging');
+  });
+
+  // ── Rotella: zoom ──
+  lbInner.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const factor = e.deltaY > 0 ? 0.88 : 1.14;
+    setZoom(currentZoom * factor, true);
+  }, { passive: false });
+
+  // ── Trigger da card ──
+  document.querySelectorAll('.lightbox-trigger[data-type="image"]').forEach(img => {
+    img.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openLightbox(img.dataset.src, 'image');
+    });
+  });
+
+  // ── Bottoni zoom ──
+  lbZoomIn.addEventListener('click',    (e) => { e.stopPropagation(); setZoom(currentZoom + 0.25); });
+  lbZoomOut.addEventListener('click',   (e) => { e.stopPropagation(); setZoom(currentZoom - 0.25); });
+  lbZoomReset.addEventListener('click', (e) => { e.stopPropagation(); setZoom(1); });
+
+  lbClose.addEventListener('click', closeLightbox);
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === '+' || e.key === '=') setZoom(currentZoom + 0.25);
+    if (e.key === '-') setZoom(Math.max(1, currentZoom - 0.25));
+    if (e.key === '0') setZoom(1);
+  });
+
+  // ── Equalizza .card-text e altezza card per riga ──
+  function equalizeCards() {
+    document.querySelectorAll('.feature-grid').forEach(grid => {
+      const cards = Array.from(grid.querySelectorAll(':scope > .feature-card:not(.wide)'));
+      if (cards.length === 0) return;
+
+      // Reset
+      cards.forEach(c => {
+        c.style.minHeight = '';
+        const t = c.querySelector('.card-text');
+        if (t) t.style.minHeight = '';
+      });
+
+      // Raggruppa per riga
+      const rows = new Map();
+      cards.forEach(card => {
+        const top = Math.round(card.getBoundingClientRect().top);
+        if (!rows.has(top)) rows.set(top, []);
+        rows.get(top).push(card);
+      });
+
+      rows.forEach(rowCards => {
+        // 1. Equalizza altezza del blocco testo
+        const texts = rowCards.map(c => c.querySelector('.card-text')).filter(Boolean);
+        const maxTextH = Math.max(...texts.map(t => t.offsetHeight));
+        texts.forEach(t => t.style.minHeight = maxTextH + 'px');
+
+        // 2. Equalizza altezza totale della card (prende l'altezza della card piu' alta)
+        const maxCardH = Math.max(...rowCards.map(c => c.offsetHeight));
+        rowCards.forEach(c => c.style.minHeight = maxCardH + 'px');
+      });
+    });
+  }
+
+  equalizeCards();
+  window.addEventListener('resize', equalizeCards);
+
   document.addEventListener('mousemove', (e) => {
     const glow = document.querySelector('.hero-glow');
     if (!glow) return;
