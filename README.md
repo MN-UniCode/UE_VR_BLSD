@@ -46,7 +46,7 @@ The project leverages industry-standard tools for real-time 3D rendering and adv
 ### ConvAI Configuration
 To utilize the conversational features, an account and specific setup are required:
 1.  **Account Creation:** Register on the [ConvAI Portal](https://convai.com/).
-2.  **Character Setup:** Create a new character on the portal. The specific personality traits and settings used for the project's instructor can be found in the [CharacterSettingsFile](./).
+2.  **Character Setup:** Create a new character on the portal. The specific personality traits and settings used for the project's instructor can be found in the [character settings file](./docs/convai/hadley_config.json).
 3.  **In-Engine Integration:**
     * Log in to the ConvAI plugin within Unreal Engine using your registered account.
     * Enter your **API Key** (this should happen automatically after login).
@@ -62,4 +62,4 @@ The simulation is designed for cross-platform accessibility:
 ## Project's Insights
 To get a closer look at the simulation in action, including video demonstrations and deeper technical insights into our development process (such as our custom modular interaction system and conversational AI psychology design), please visit our dedicated project page:
 
-**[Link to your GitHub Pages / Showcase Website]**
+**[https://mn-unicode.github.io/UE_VR_BLSD/](https://mn-unicode.github.io/UE_VR_BLSD/)**
