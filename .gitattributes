@@ -6,3 +6,4 @@ Ue_blsd/Plugins/Convai/**/*.dll filter=lfs diff=lfs merge=lfs -text
 Ue_blsd/Plugins/Convai/**/*.lib filter=lfs diff=lfs merge=lfs -text
 Ue_blsd/Plugins/Convai/**/*.pdb filter=lfs diff=lfs merge=lfs -text
 Ue_blsd/Plugins/Convai/**/*.uasset filter=lfs diff=lfs merge=lfs -text
+docs/assets/videos/* filter=lfs diff=lfs merge=lfs -text
